@@ -118,8 +118,8 @@ const Index = () => {
                 <TabsContent value="analysis">
                   <AnalysisResults analysis={analysis} idea={submittedIdea} />
                 </TabsContent>
-                <TabsContent value="preview">
-                  <AppPreview idea={submittedIdea} analysis={analysis} />
+                <TabsContent value="preview" forceMount className="data-[state=inactive]:hidden">
+                  <AppPreview key={submittedIdea} idea={submittedIdea} analysis={analysis} />
                 </TabsContent>
               </Tabs>
               <div className="flex justify-center mt-8">
