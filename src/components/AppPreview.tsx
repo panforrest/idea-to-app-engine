@@ -58,12 +58,14 @@ const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("AppPreview: useEffect triggered, idea:", idea);
+    console.log("AppPreview: Component mounted/updated, idea:", idea);
+    // Always generate when mounted with an idea
     if (idea) {
       console.log("AppPreview: Starting generation for idea:", idea);
       generatePreview();
     }
-  }, [idea]); // Re-run when idea changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount - parent will remount with new idea
 
   const generatePreview = async () => {
     console.log("AppPreview: generatePreview called");
