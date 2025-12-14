@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Smartphone, 
@@ -49,7 +49,7 @@ interface AppPreviewProps {
   analysis: any;
 }
 
-const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis }, ref) => {
+const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
   const [appPreview, setAppPreview] = useState<AppPreviewData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,12 +58,12 @@ const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Generate preview on mount (component is keyed by idea in parent)
+    console.log("AppPreview: useEffect triggered, idea:", idea);
     if (idea) {
       console.log("AppPreview: Starting generation for idea:", idea);
       generatePreview();
     }
-  }, []); // Empty deps - only run on mount since parent uses key={idea}
+  }, [idea]); // Re-run when idea changes
 
   const generatePreview = async () => {
     console.log("AppPreview: generatePreview called");
@@ -386,8 +386,6 @@ const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis
       </motion.div>
     </motion.div>
   );
-});
-
-AppPreview.displayName = "AppPreview";
+};
 
 export default AppPreview;
