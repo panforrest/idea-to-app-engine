@@ -84,15 +84,17 @@ interface FlowgladContextType {
 const FlowgladContext = createContext<FlowgladContextType | null>(null);
 
 export function FlowgladProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [billing, setBilling] = useState<BillingData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   const fetchBilling = useCallback(async () => {
-    if (!user) {
+    // Only fetch if we have both user and session
+    if (!user || !session) {
       setBilling(null);
+      setError(null);
       setLoaded(true);
       return;
     }
@@ -101,26 +103,19 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
-      // Check if we have a valid session before making the request
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session) {
-        console.log("Billing: No active session, skipping billing fetch");
-        setBilling(null);
-        return;
-      }
-
       const { data, error: fnError } = await supabase.functions.invoke("flowglad-billing", {
         body: { action: "getBilling" },
       });
 
       // Handle various error formats from Supabase
       if (fnError) {
-        // Check if it's an auth-related error
+        // Check if it's an auth-related error - silently handle these
         const isAuthError = 
           fnError.name === "FunctionsHttpError" ||
           String(fnError.message || "").includes("401") ||
           String(fnError.message || "").includes("Unauthorized") ||
-          String(fnError.message || "").includes("non-2xx");
+          String(fnError.message || "").includes("non-2xx") ||
+          String(fnError.message || "").includes("Session not found");
         
         if (isAuthError) {
           console.log("Billing: Auth issue, skipping billing fetch");
@@ -132,7 +127,8 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
       
       // Also check if data contains an error (edge function might return error in body)
       if (data?.error) {
-        if (String(data.error).includes("Unauthorized") || String(data.error).includes("401")) {
+        const errorStr = String(data.error);
+        if (errorStr.includes("Unauthorized") || errorStr.includes("401") || errorStr.includes("Session")) {
           console.log("Billing: Auth issue from response, skipping billing fetch");
           setBilling(null);
           return;
@@ -147,7 +143,8 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
         errorMessage.includes("401") || 
         errorMessage.includes("Unauthorized") ||
         errorMessage.includes("FunctionsHttpError") ||
-        errorMessage.includes("non-2xx");
+        errorMessage.includes("non-2xx") ||
+        errorMessage.includes("Session");
       
       if (!isAuthError) {
         console.error("Error fetching billing:", e);
@@ -160,15 +157,17 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setLoaded(true);
     }
-  }, [user]);
+  }, [user, session]);
 
   useEffect(() => {
     fetchBilling();
   }, [fetchBilling]);
 
   const createCheckoutSession = async (params: CheckoutSessionParams) => {
-    if (!user) {
-      throw new Error("User must be logged in");
+    // Verify we have an active session before making the request
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData?.session) {
+      throw new Error("Please log in to continue");
     }
 
     try {
@@ -176,14 +175,25 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
         body: { action: "createCheckoutSession", ...params },
       });
 
-      if (fnError) throw fnError;
+      if (fnError) {
+        // Check if it's an auth error
+        const isAuthError = 
+          fnError.name === "FunctionsHttpError" ||
+          String(fnError.message || "").includes("401") ||
+          String(fnError.message || "").includes("Unauthorized");
+        
+        if (isAuthError) {
+          throw new Error("Session expired. Please log in again.");
+        }
+        throw fnError;
+      }
 
       if (params.autoRedirect && data?.url) {
         window.location.href = data.url;
       }
 
       return data;
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error creating checkout session:", e);
       throw e;
     }
