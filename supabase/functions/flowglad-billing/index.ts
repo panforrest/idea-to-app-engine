@@ -17,15 +17,27 @@ serve(async (req) => {
   try {
     const FLOWGLAD_SECRET_KEY = Deno.env.get("FLOWGLAD_SECRET_KEY");
     if (!FLOWGLAD_SECRET_KEY) {
+      console.error("FLOWGLAD_SECRET_KEY is not configured");
       throw new Error("FLOWGLAD_SECRET_KEY is not configured");
     }
 
     // Get authorization header to identify user
     const authHeader = req.headers.get("authorization");
+    console.log("Auth header present:", !!authHeader);
+    
     if (!authHeader) {
+      // Return empty billing data instead of 401 for unauthenticated requests
+      console.log("No auth header - returning empty billing");
       return new Response(
-        JSON.stringify({ error: "Authorization header required" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ 
+          customer: null, 
+          subscriptions: [], 
+          currentSubscription: null,
+          invoices: [],
+          pricingModel: null,
+          unauthenticated: true 
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -37,10 +49,21 @@ serve(async (req) => {
     });
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
+    console.log("User lookup result:", user ? user.id : "no user", "Error:", userError?.message);
+    
     if (userError || !user) {
+      // Return empty billing data instead of 401 for invalid/expired sessions
+      console.log("Invalid session - returning empty billing");
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ 
+          customer: null, 
+          subscriptions: [], 
+          currentSubscription: null,
+          invoices: [],
+          pricingModel: null,
+          sessionExpired: true 
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

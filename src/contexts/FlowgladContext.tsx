@@ -91,8 +91,11 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
   const [loaded, setLoaded] = useState(false);
 
   const fetchBilling = useCallback(async () => {
+    console.log("FlowgladContext: fetchBilling called, user:", !!user, "session:", !!session);
+    
     // Only fetch if we have both user and session
     if (!user || !session) {
+      console.log("FlowgladContext: No user or session, clearing billing");
       setBilling(null);
       setError(null);
       setLoaded(true);
@@ -103,6 +106,7 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
+      console.log("FlowgladContext: Invoking flowglad-billing edge function");
       const { data, error: fnError } = await supabase.functions.invoke("flowglad-billing", {
         body: { action: "getBilling" },
       });
@@ -125,6 +129,13 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
         throw fnError;
       }
       
+      // Check if the response indicates an unauthenticated or expired session
+      if (data?.unauthenticated || data?.sessionExpired) {
+        console.log("FlowgladContext: Received unauthenticated/expired response from edge function");
+        setBilling(null);
+        return;
+      }
+      
       // Also check if data contains an error (edge function might return error in body)
       if (data?.error) {
         const errorStr = String(data.error);
@@ -135,10 +146,13 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
         }
       }
       
+      console.log("FlowgladContext: Setting billing data", !!data);
       setBilling(data);
     } catch (e: any) {
       // Silently handle auth errors - don't show error state
       const errorMessage = e?.message || e?.name || e?.toString() || String(e);
+      console.log("FlowgladContext: Caught error:", errorMessage);
+      
       const isAuthError = 
         errorMessage.includes("401") || 
         errorMessage.includes("Unauthorized") ||
