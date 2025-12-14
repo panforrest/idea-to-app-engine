@@ -69,16 +69,19 @@ serve(async (req) => {
 
     // Find or create customer based on user ID
     const findOrCreateCustomer = async () => {
-      // Try to find existing customer by external ID
+      // Try to find existing customer by fetching all and filtering by externalId
       try {
-        const customersResponse = await flowgladRequest(`/customers?externalId=${user.id}`);
-        console.log("Customer lookup response:", JSON.stringify(customersResponse));
-        if (customersResponse.data && Array.isArray(customersResponse.data) && customersResponse.data.length > 0) {
-          return customersResponse.data[0];
-        }
-        // Handle case where data is the customer object directly
-        if (customersResponse.data?.customer) {
-          return customersResponse.data.customer;
+        const customersResponse = await flowgladRequest("/customers");
+        console.log("Customers list response:", JSON.stringify(customersResponse));
+        
+        if (customersResponse.data && Array.isArray(customersResponse.data)) {
+          const existingCustomer = customersResponse.data.find(
+            (c: any) => c.externalId === user.id
+          );
+          if (existingCustomer) {
+            console.log("Found existing customer:", existingCustomer.id);
+            return existingCustomer;
+          }
         }
       } catch (e) {
         console.log("Customer lookup failed:", e);
@@ -86,6 +89,7 @@ serve(async (req) => {
 
       // Create new customer
       try {
+        console.log("Creating new customer for user:", user.id);
         const newCustomerResponse = await flowgladRequest("/customers", "POST", {
           customer: {
             externalId: user.id,
@@ -96,15 +100,17 @@ serve(async (req) => {
         console.log("Create customer response:", JSON.stringify(newCustomerResponse));
         return newCustomerResponse.data?.customer || newCustomerResponse;
       } catch (createError: any) {
-        // If 409 conflict, customer already exists - try to fetch again
+        // If 409 conflict, customer already exists - fetch all and find
         if (createError.message?.includes("409")) {
-          console.log("Customer already exists, fetching again...");
-          const retryResponse = await flowgladRequest(`/customers?externalId=${user.id}`);
-          if (retryResponse.data && Array.isArray(retryResponse.data) && retryResponse.data.length > 0) {
-            return retryResponse.data[0];
-          }
-          if (retryResponse.data?.customer) {
-            return retryResponse.data.customer;
+          console.log("Customer already exists (409), fetching all to find...");
+          const retryResponse = await flowgladRequest("/customers");
+          if (retryResponse.data && Array.isArray(retryResponse.data)) {
+            const existingCustomer = retryResponse.data.find(
+              (c: any) => c.externalId === user.id
+            );
+            if (existingCustomer) {
+              return existingCustomer;
+            }
           }
         }
         throw createError;
