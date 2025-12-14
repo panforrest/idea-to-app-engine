@@ -163,12 +163,12 @@ serve(async (req) => {
         const customer = await findOrCreateCustomer();
         const { priceSlug, priceId, successUrl, cancelUrl, quantity = 1 } = params;
 
-        console.log("Creating checkout session with:", { customerId: customer.id, priceSlug, priceId, successUrl, cancelUrl });
+        console.log("Creating checkout session with:", { customerExternalId: customer.externalId, priceSlug, priceId, successUrl, cancelUrl });
         
         const checkoutSession = await flowgladRequest("/checkout-sessions", "POST", {
           checkoutSession: {
             type: "product",
-            customerId: customer.id,
+            customerExternalId: customer.externalId,
             ...(priceSlug && { priceSlug }),
             ...(priceId && { priceId }),
             successUrl,
