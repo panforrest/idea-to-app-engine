@@ -72,23 +72,43 @@ serve(async (req) => {
       // Try to find existing customer by external ID
       try {
         const customersResponse = await flowgladRequest(`/customers?externalId=${user.id}`);
-        if (customersResponse.data && customersResponse.data.length > 0) {
+        console.log("Customer lookup response:", JSON.stringify(customersResponse));
+        if (customersResponse.data && Array.isArray(customersResponse.data) && customersResponse.data.length > 0) {
           return customersResponse.data[0];
         }
+        // Handle case where data is the customer object directly
+        if (customersResponse.data?.customer) {
+          return customersResponse.data.customer;
+        }
       } catch (e) {
-        console.log("Customer not found, creating new one");
+        console.log("Customer lookup failed:", e);
       }
 
       // Create new customer
-      const newCustomerResponse = await flowgladRequest("/customers", "POST", {
-        customer: {
-          externalId: user.id,
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
-        },
-      });
-
-      return newCustomerResponse.data?.customer || newCustomerResponse;
+      try {
+        const newCustomerResponse = await flowgladRequest("/customers", "POST", {
+          customer: {
+            externalId: user.id,
+            email: user.email,
+            name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+          },
+        });
+        console.log("Create customer response:", JSON.stringify(newCustomerResponse));
+        return newCustomerResponse.data?.customer || newCustomerResponse;
+      } catch (createError: any) {
+        // If 409 conflict, customer already exists - try to fetch again
+        if (createError.message?.includes("409")) {
+          console.log("Customer already exists, fetching again...");
+          const retryResponse = await flowgladRequest(`/customers?externalId=${user.id}`);
+          if (retryResponse.data && Array.isArray(retryResponse.data) && retryResponse.data.length > 0) {
+            return retryResponse.data[0];
+          }
+          if (retryResponse.data?.customer) {
+            return retryResponse.data.customer;
+          }
+        }
+        throw createError;
+      }
     };
 
     let result: any;
