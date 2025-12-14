@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { Zap, Menu } from "lucide-react";
+import { Zap, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NavbarProps {
   onGetStarted: () => void;
@@ -9,6 +11,16 @@ interface NavbarProps {
 
 const Navbar = ({ onGetStarted }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAuthClick = () => {
+    if (user) {
+      signOut();
+    } else {
+      navigate("/auth");
+    }
+  };
 
   return (
     <motion.nav
@@ -42,13 +54,25 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
               <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 How It Works
               </a>
-              <Button
-                size="sm"
-                onClick={onGetStarted}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                Get Started
-              </Button>
+              {user ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleAuthClick}
+                  className="gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={handleAuthClick}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -78,13 +102,25 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
                 <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   How It Works
                 </a>
-                <Button
-                  size="sm"
-                  onClick={onGetStarted}
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Get Started
-                </Button>
+                {user ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleAuthClick}
+                    className="w-full gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    onClick={handleAuthClick}
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Sign In
+                  </Button>
+                )}
               </div>
             </motion.div>
           )}
