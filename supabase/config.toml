@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.flowglad-billing]
 verify_jwt = false
+
+[functions.generate-app-preview]
+verify_jwt = false
