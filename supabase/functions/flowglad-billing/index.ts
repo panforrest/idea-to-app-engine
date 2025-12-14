@@ -127,9 +127,10 @@ serve(async (req) => {
         let subscriptions: any[] = [];
         try {
           const subsResponse = await flowgladRequest(`/subscriptions?customerId=${customer.id}`);
+          console.log("Subscriptions response:", JSON.stringify(subsResponse));
           subscriptions = subsResponse.data || [];
         } catch (e) {
-          console.log("No subscriptions found");
+          console.log("No subscriptions found:", e);
         }
 
         // Get invoices for customer

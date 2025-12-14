@@ -57,8 +57,17 @@ const Billing = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateValue: string | number | undefined) => {
+    if (!dateValue) return "N/A";
+    
+    // Handle both string dates and numeric timestamps (milliseconds)
+    const date = typeof dateValue === "number" 
+      ? new Date(dateValue) 
+      : new Date(dateValue);
+    
+    if (isNaN(date.getTime())) return "N/A";
+    
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -146,17 +155,26 @@ const Billing = () => {
                             <div>
                               <p className="text-sm text-muted-foreground">Current Period Ends</p>
                               <p className="font-medium">
-                                {formatDate(billing.currentSubscription.currentPeriodEnd)}
+                                {formatDate(
+                                  billing.currentSubscription.currentPeriodEnd || 
+                                  billing.currentSubscription.current_period_end
+                                )}
                               </p>
                             </div>
                           </div>
-                          {billing.currentSubscription.cancelScheduledAt && (
+                          {(billing.currentSubscription.cancelScheduledAt || 
+                            billing.currentSubscription.canceledAt || 
+                            billing.currentSubscription.canceled_at) && (
                             <div className="flex items-center gap-3">
                               <AlertCircle className="w-5 h-5 text-yellow-500" />
                               <div>
                                 <p className="text-sm text-muted-foreground">Cancels On</p>
                                 <p className="font-medium text-yellow-500">
-                                  {formatDate(billing.currentSubscription.cancelScheduledAt)}
+                                  {formatDate(
+                                    billing.currentSubscription.cancelScheduledAt || 
+                                    billing.currentSubscription.canceledAt ||
+                                    billing.currentSubscription.canceled_at
+                                  )}
                                 </p>
                               </div>
                             </div>

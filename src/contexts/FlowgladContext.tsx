@@ -13,9 +13,14 @@ interface Subscription {
   id: string;
   status: string;
   priceId: string;
-  currentPeriodStart: string;
-  currentPeriodEnd: string;
-  cancelScheduledAt?: string;
+  // FlowGlad may use different field names - support both
+  currentPeriodStart?: string | number;
+  currentPeriodEnd?: string | number;
+  current_period_start?: string | number;
+  current_period_end?: string | number;
+  cancelScheduledAt?: string | number;
+  canceledAt?: string | number;
+  canceled_at?: string | number;
 }
 
 interface Invoice {
