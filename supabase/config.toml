@@ -2,3 +2,6 @@ project_id = "rhluumymxyqzttozgcqn"
 
 [functions.analyze-idea]
 verify_jwt = false
+
+[functions.flowglad-billing]
+verify_jwt = false

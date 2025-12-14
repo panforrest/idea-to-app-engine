@@ -56,6 +56,12 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
                   History
                 </button>
               )}
+              <button
+                onClick={() => navigate("/pricing")}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Pricing
+              </button>
               <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 How It Works
               </a>
@@ -109,6 +115,12 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
                     History
                   </button>
                 )}
+                <button
+                  onClick={() => navigate("/pricing")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-left"
+                >
+                  Pricing
+                </button>
                 <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   How It Works
                 </a>
