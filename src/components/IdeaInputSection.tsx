@@ -64,7 +64,7 @@ const IdeaInputSection = ({ onSubmit, isLoading = false }: IdeaInputSectionProps
             className="space-y-6"
           >
             <div className="relative">
-              <div className="gradient-border rounded-xl">
+              <div className="rounded-xl border-2 border-primary/30 hover:border-primary/50 transition-colors">
                 <Textarea
                   value={idea}
                   onChange={(e) => setIdea(e.target.value)}
@@ -75,7 +75,7 @@ const IdeaInputSection = ({ onSubmit, isLoading = false }: IdeaInputSectionProps
               </div>
               
               {/* Character count */}
-              <div className="absolute bottom-4 right-4 text-sm text-muted-foreground">
+              <div className="absolute bottom-4 right-4 text-sm text-muted-foreground pointer-events-none">
                 {idea.length} / 500
               </div>
             </div>
@@ -117,9 +117,10 @@ const IdeaInputSection = ({ onSubmit, isLoading = false }: IdeaInputSectionProps
               {exampleIdeas.map((example, index) => (
                 <button
                   key={index}
+                  type="button"
                   onClick={() => handleExampleClick(example)}
                   disabled={isLoading}
-                  className="px-4 py-2 text-sm rounded-full glass hover:bg-secondary/50 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 text-sm rounded-full bg-secondary/50 border border-border hover:bg-secondary hover:border-primary/30 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {example.length > 40 ? example.substring(0, 40) + "..." : example}
                 </button>
