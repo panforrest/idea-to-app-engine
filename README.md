@@ -1,73 +1,165 @@
-# Welcome to your Lovable project
+# FlowGladiator 🚀
 
-## Project info
+**AI-Powered Startup Idea Analyzer & App Generator**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+> Turn your startup idea into a complete, revenue-ready app with AI-powered generation and built-in payments.
 
-## How can I edit this code?
+Built for the **FlowGlad Vibe Coding Hackathon 2024** 🏆
 
-There are several ways of editing your application.
+![FlowGladiator](https://img.shields.io/badge/FlowGladiator-AI%20Powered-cyan)
+![React](https://img.shields.io/badge/React-18.3-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-green)
+![FlowGlad](https://img.shields.io/badge/FlowGlad-Payments-orange)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## ✨ Features
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🧠 AI Idea Analysis
+- **Instant viability scoring** - Get a 0-100 score on your startup idea's potential
+- **Market analysis** - Understand market potential (low/medium/high)
+- **Strengths & challenges** - AI-identified pros and cons
+- **Target audience identification** - Know your ideal customers
+- **Revenue model suggestions** - Monetization strategies tailored to your idea
+- **Actionable next steps** - Clear roadmap to move forward
 
-**Use your preferred IDE**
+### 🎨 AI App Preview Generator
+- **Visual app mockups** - See your app concept come to life
+- **Color scheme generation** - AI-designed brand colors
+- **Screen-by-screen breakdown** - Dashboard, key features, user flows
+- **Phone mockup visualization** - See how your app looks on mobile
+- **Key features extraction** - Core functionality identified
+- **Monetization UI concepts** - Pricing page designs
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 💳 FlowGlad Payment Integration
+- **Seamless checkout** - One-click subscription setup
+- **Multiple pricing tiers** - Free, Pro, and Enterprise plans
+- **Subscription management** - Upgrade, downgrade, cancel anytime
+- **Billing portal** - Full billing history and management
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🔐 Authentication
+- **Email/password login** - Simple, secure authentication
+- **Session management** - Persistent login across sessions
+- **Protected features** - Premium features gated behind subscription
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🛠️ Tech Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+| Category | Technology |
+|----------|------------|
+| **Frontend** | React 18, TypeScript, Vite |
+| **Styling** | Tailwind CSS, shadcn/ui |
+| **Backend** | Supabase (Lovable Cloud) |
+| **AI** | Google Gemini 2.5 Flash (via Lovable AI) |
+| **Payments** | FlowGlad |
+| **Database** | PostgreSQL (Supabase) |
+| **Edge Functions** | Deno (Supabase Functions) |
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/FlowGlad-iator.git
+
+# Navigate to project directory
+cd FlowGlad-iator
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The following environment variables are required (automatically configured in Lovable):
 
-**Use GitHub Codespaces**
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 📁 Project Structure
 
-This project is built with:
+```
+FlowGlad-iator/
+├── src/
+│   ├── components/          # React components
+│   │   ├── ui/              # shadcn/ui components
+│   │   ├── AppPreview.tsx   # AI app preview generator
+│   │   ├── AnalysisResults.tsx
+│   │   ├── HeroSection.tsx
+│   │   └── ...
+│   ├── contexts/            # React contexts
+│   ├── hooks/               # Custom hooks
+│   ├── pages/               # Page components
+│   │   ├── Index.tsx        # Main landing page
+│   │   ├── Auth.tsx         # Authentication
+│   │   ├── Pricing.tsx      # Pricing plans
+│   │   ├── Billing.tsx      # Subscription management
+│   │   └── History.tsx      # Analysis history
+│   └── integrations/        # External integrations
+├── supabase/
+│   ├── functions/           # Edge functions
+│   │   ├── analyze-idea/    # AI idea analysis
+│   │   ├── generate-app-preview/  # AI app preview
+│   │   └── flowglad-billing/      # Payment processing
+│   └── config.toml          # Supabase configuration
+└── ...
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 🎯 How It Works
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+1. **Describe Your Idea** - Enter your startup concept in natural language
+2. **AI Analysis** - Gemini 2.5 Flash analyzes viability, market, and potential
+3. **App Preview** - AI generates a visual concept with screens and features
+4. **Monetize** - Subscribe to unlock premium features and build your app
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 🏆 Hackathon Context
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+**FlowGlad Vibe Coding Hackathon**
+- **Date**: December 14, 2025
+- **Location**: FlowGlad offices, New York
+- **Judging Criteria**:
+  - 50% Creative Use of Vibe Coding
+  - 50% Transaction Dollar Volume
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+FlowGladiator demonstrates:
+- ✅ **Vibe Coding**: AI-generated UI/UX, dynamic app concepts, intelligent analysis
+- ✅ **Real Payments**: Full FlowGlad integration with live checkout
+
+---
+
+## 📄 License
+
+MIT License - feel free to use this project as inspiration for your own ideas!
+
+---
+
+## 🙏 Acknowledgments
+
+- [Lovable](https://lovable.dev) - AI-powered app development platform
+- [FlowGlad](https://flowglad.com) - Payments infrastructure
+- [Supabase](https://supabase.com) - Backend as a service
+- [shadcn/ui](https://ui.shadcn.com) - Beautiful UI components
+
+---
+
+**Built with ❤️ using Lovable**
