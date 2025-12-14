@@ -118,7 +118,7 @@ const Index = () => {
                 <TabsContent value="analysis">
                   <AnalysisResults analysis={analysis} idea={submittedIdea} />
                 </TabsContent>
-                <TabsContent value="preview" forceMount className="data-[state=inactive]:hidden">
+                <TabsContent value="preview">
                   <AppPreview key={submittedIdea} idea={submittedIdea} analysis={analysis} />
                 </TabsContent>
               </Tabs>
