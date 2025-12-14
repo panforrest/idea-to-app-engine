@@ -115,10 +115,10 @@ const Index = () => {
                   <TabsTrigger value="analysis">📊 Analysis</TabsTrigger>
                   <TabsTrigger value="preview">🎨 App Preview</TabsTrigger>
                 </TabsList>
-                <TabsContent value="analysis">
+                <TabsContent value="analysis" forceMount className="data-[state=inactive]:hidden">
                   <AnalysisResults analysis={analysis} idea={submittedIdea} />
                 </TabsContent>
-                <TabsContent value="preview">
+                <TabsContent value="preview" forceMount className="data-[state=inactive]:hidden">
                   <AppPreview key={`preview-${submittedIdea}`} idea={submittedIdea} analysis={analysis} />
                 </TabsContent>
               </Tabs>
