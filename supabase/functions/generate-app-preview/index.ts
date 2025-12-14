@@ -123,6 +123,15 @@ Create a modern, professional app concept that would appeal to the target audien
     let appPreview;
     try {
       appPreview = JSON.parse(jsonStr);
+      
+      // Normalize screen field names (AI sometimes uses screenName instead of name)
+      if (appPreview.screens && Array.isArray(appPreview.screens)) {
+        appPreview.screens = appPreview.screens.map((screen: any) => ({
+          name: screen.name || screen.screenName || "Screen",
+          description: screen.description || "",
+          keyElements: screen.keyElements || []
+        }));
+      }
     } catch (parseError) {
       console.error('Failed to parse AI response:', content);
       // Return a structured fallback
