@@ -101,15 +101,28 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
+      // Check if we have a valid session before making the request
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        console.log("Billing: No active session, skipping billing fetch");
+        setBilling(null);
+        return;
+      }
+
       const { data, error: fnError } = await supabase.functions.invoke("flowglad-billing", {
         body: { action: "getBilling" },
       });
 
       // Handle various error formats from Supabase
       if (fnError) {
-        const errorStr = JSON.stringify(fnError);
-        // Don't throw on 401/Unauthorized - just means user session issue
-        if (errorStr.includes("401") || errorStr.includes("Unauthorized") || fnError.status === 401) {
+        // Check if it's an auth-related error
+        const isAuthError = 
+          fnError.name === "FunctionsHttpError" ||
+          String(fnError.message || "").includes("401") ||
+          String(fnError.message || "").includes("Unauthorized") ||
+          String(fnError.message || "").includes("non-2xx");
+        
+        if (isAuthError) {
           console.log("Billing: Auth issue, skipping billing fetch");
           setBilling(null);
           return;
@@ -128,10 +141,16 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
       
       setBilling(data);
     } catch (e: any) {
-      console.error("Error fetching billing:", e);
-      // Don't set error for auth-related issues
-      const errorMessage = e?.message || e?.toString() || String(e);
-      if (!errorMessage.includes("401") && !errorMessage.includes("Unauthorized")) {
+      // Silently handle auth errors - don't show error state
+      const errorMessage = e?.message || e?.name || e?.toString() || String(e);
+      const isAuthError = 
+        errorMessage.includes("401") || 
+        errorMessage.includes("Unauthorized") ||
+        errorMessage.includes("FunctionsHttpError") ||
+        errorMessage.includes("non-2xx");
+      
+      if (!isAuthError) {
+        console.error("Error fetching billing:", e);
         setError(e instanceof Error ? e : new Error("Failed to fetch billing"));
       } else {
         console.log("Billing: Caught auth error, gracefully handling");
