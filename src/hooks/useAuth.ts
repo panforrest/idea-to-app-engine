@@ -24,7 +24,14 @@ export const useAuth = () => {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.log("Sign out error (session may already be invalid):", error);
+    }
+    // Always clear local state, even if server call fails
+    setSession(null);
+    setUser(null);
   };
 
   return { user, session, loading, signOut };
