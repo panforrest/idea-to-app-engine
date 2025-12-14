@@ -115,11 +115,11 @@ const Index = () => {
                   <TabsTrigger value="analysis">📊 Analysis</TabsTrigger>
                   <TabsTrigger value="preview">🎨 App Preview</TabsTrigger>
                 </TabsList>
-                <TabsContent value="analysis" forceMount className="data-[state=inactive]:hidden">
+                <TabsContent value="analysis">
                   <AnalysisResults analysis={analysis} idea={submittedIdea} />
                 </TabsContent>
-                <TabsContent value="preview" forceMount className="data-[state=inactive]:hidden">
-                  <AppPreview idea={submittedIdea} analysis={analysis} />
+                <TabsContent value="preview">
+                  <AppPreview key={submittedIdea} idea={submittedIdea} analysis={analysis} />
                 </TabsContent>
               </Tabs>
               <div className="flex justify-center mt-8">
