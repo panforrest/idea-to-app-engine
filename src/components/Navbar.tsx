@@ -62,6 +62,14 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
               >
                 Pricing
               </button>
+              {user && (
+                <button
+                  onClick={() => navigate("/billing")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Billing
+                </button>
+              )}
               <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 How It Works
               </a>
@@ -121,6 +129,14 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
                 >
                   Pricing
                 </button>
+                {user && (
+                  <button
+                    onClick={() => navigate("/billing")}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-left"
+                  >
+                    Billing
+                  </button>
+                )}
                 <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   How It Works
                 </a>
