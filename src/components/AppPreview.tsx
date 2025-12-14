@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, forwardRef } from "react";
 import { motion } from "framer-motion";
 import { 
   Smartphone, 
@@ -49,16 +49,21 @@ interface AppPreviewProps {
   analysis: any;
 }
 
-const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
+const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis }, ref) => {
   const [appPreview, setAppPreview] = useState<AppPreviewData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeScreen, setActiveScreen] = useState(0);
+  const hasGenerated = useRef(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    generatePreview();
+    // Only generate once per idea
+    if (!hasGenerated.current && idea) {
+      hasGenerated.current = true;
+      generatePreview();
+    }
   }, [idea]);
 
   const generatePreview = async () => {
@@ -370,6 +375,8 @@ const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
       </motion.div>
     </motion.div>
   );
-};
+});
+
+AppPreview.displayName = "AppPreview";
 
 export default AppPreview;
