@@ -41,14 +41,18 @@ serve(async (req) => {
       );
     }
 
-    // Create Supabase client to get user info
+    // Create Supabase client to get user info - use service role key for reliable auth
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    
+    // Extract the JWT token from the auth header
+    const token = authHeader.replace("Bearer ", "");
+    
+    // Create client with service role for admin access
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // Get user from the JWT token directly
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     console.log("User lookup result:", user ? user.id : "no user", "Error:", userError?.message);
     
     if (userError || !user) {
