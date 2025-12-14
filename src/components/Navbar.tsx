@@ -48,9 +48,14 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
               <a href="#generator" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Generator
               </a>
-              <a href="#gallery" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                App Gallery
-              </a>
+              {user && (
+                <button
+                  onClick={() => navigate("/history")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  History
+                </button>
+              )}
               <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 How It Works
               </a>
@@ -96,9 +101,14 @@ const Navbar = ({ onGetStarted }: NavbarProps) => {
                 <a href="#generator" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Generator
                 </a>
-                <a href="#gallery" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  App Gallery
-                </a>
+                {user && (
+                  <button
+                    onClick={() => navigate("/history")}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-left"
+                  >
+                    History
+                  </button>
+                )}
                 <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   How It Works
                 </a>
