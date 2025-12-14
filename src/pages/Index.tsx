@@ -7,6 +7,7 @@ import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AnalysisData {
   summary: string;
@@ -25,6 +26,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [submittedIdea, setSubmittedIdea] = useState("");
+  const { user } = useAuth();
 
   const scrollToGenerator = () => {
     const generatorSection = document.getElementById("generator");
@@ -52,6 +54,16 @@ const Index = () => {
       }
 
       setAnalysis(data.analysis);
+
+      // Save to database if user is logged in
+      if (user) {
+        await supabase.from('analyses').insert({
+          user_id: user.id,
+          idea,
+          analysis: data.analysis
+        });
+      }
+
       toast({
         title: "Analysis Complete!",
         description: "Your startup idea has been analyzed. Check out the results below.",
