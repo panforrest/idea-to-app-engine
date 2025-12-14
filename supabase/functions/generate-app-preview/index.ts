@@ -124,12 +124,23 @@ Create a modern, professional app concept that would appeal to the target audien
     try {
       appPreview = JSON.parse(jsonStr);
       
-      // Normalize screen field names (AI sometimes uses screenName instead of name)
+      // Normalize screen field names and ensure keyElements are strings
       if (appPreview.screens && Array.isArray(appPreview.screens)) {
         appPreview.screens = appPreview.screens.map((screen: any) => ({
-          name: screen.name || screen.screenName || "Screen",
-          description: screen.description || "",
-          keyElements: screen.keyElements || []
+          name: String(screen.name || screen.screenName || "Screen"),
+          description: String(screen.description || ""),
+          keyElements: Array.isArray(screen.keyElements) 
+            ? screen.keyElements.map((el: any) => typeof el === 'string' ? el : String(el.name || el.title || el.text || JSON.stringify(el)))
+            : []
+        }));
+      }
+      
+      // Normalize keyFeatures to ensure all fields are strings
+      if (appPreview.keyFeatures && Array.isArray(appPreview.keyFeatures)) {
+        appPreview.keyFeatures = appPreview.keyFeatures.map((feature: any) => ({
+          icon: String(feature.icon || "✨"),
+          title: String(feature.title || "Feature"),
+          description: String(feature.description || "")
         }));
       }
     } catch (parseError) {
