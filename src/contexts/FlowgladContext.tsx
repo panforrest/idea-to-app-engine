@@ -105,22 +105,37 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
         body: { action: "getBilling" },
       });
 
+      // Handle various error formats from Supabase
       if (fnError) {
-        // Don't throw on 401 - just means user isn't authenticated
-        if (fnError.message?.includes("401") || fnError.message?.includes("Unauthorized")) {
-          console.log("Billing: User not authenticated, skipping billing fetch");
+        const errorStr = JSON.stringify(fnError);
+        // Don't throw on 401/Unauthorized - just means user session issue
+        if (errorStr.includes("401") || errorStr.includes("Unauthorized") || fnError.status === 401) {
+          console.log("Billing: Auth issue, skipping billing fetch");
           setBilling(null);
           return;
         }
         throw fnError;
       }
+      
+      // Also check if data contains an error (edge function might return error in body)
+      if (data?.error) {
+        if (String(data.error).includes("Unauthorized") || String(data.error).includes("401")) {
+          console.log("Billing: Auth issue from response, skipping billing fetch");
+          setBilling(null);
+          return;
+        }
+      }
+      
       setBilling(data);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error fetching billing:", e);
       // Don't set error for auth-related issues
-      const errorMessage = e instanceof Error ? e.message : String(e);
+      const errorMessage = e?.message || e?.toString() || String(e);
       if (!errorMessage.includes("401") && !errorMessage.includes("Unauthorized")) {
         setError(e instanceof Error ? e : new Error("Failed to fetch billing"));
+      } else {
+        console.log("Billing: Caught auth error, gracefully handling");
+        setBilling(null);
       }
     } finally {
       setIsLoading(false);
