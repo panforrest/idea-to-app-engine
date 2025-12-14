@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { motion } from "framer-motion";
 import { 
   Smartphone, 
@@ -54,36 +54,44 @@ const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeScreen, setActiveScreen] = useState(0);
-  const lastGeneratedIdea = useRef<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Generate preview when idea changes (new idea submitted)
-    if (idea && idea !== lastGeneratedIdea.current) {
-      lastGeneratedIdea.current = idea;
+    // Generate preview on mount (component is keyed by idea in parent)
+    if (idea) {
+      console.log("AppPreview: Starting generation for idea:", idea);
       generatePreview();
     }
-  }, [idea]);
+  }, []); // Empty deps - only run on mount since parent uses key={idea}
 
   const generatePreview = async () => {
+    console.log("AppPreview: generatePreview called");
     setIsLoading(true);
     setError(null);
 
     try {
+      console.log("AppPreview: Invoking edge function...");
       const { data, error: fnError } = await supabase.functions.invoke("generate-app-preview", {
         body: { idea, analysis },
       });
 
+      console.log("AppPreview: Response received", { data, fnError });
+
       if (fnError) throw fnError;
       
-      if (data.error) {
+      if (data?.error) {
         throw new Error(data.error);
       }
 
-      setAppPreview(data.appPreview);
+      if (data?.appPreview) {
+        console.log("AppPreview: Setting app preview:", data.appPreview.appName);
+        setAppPreview(data.appPreview);
+      } else {
+        throw new Error("No app preview data received");
+      }
     } catch (e) {
-      console.error("Error generating app preview:", e);
+      console.error("AppPreview: Error generating app preview:", e);
       setError(e instanceof Error ? e.message : "Failed to generate preview");
       toast({
         title: "Preview Generation Failed",
@@ -91,6 +99,7 @@ const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis
         variant: "destructive",
       });
     } finally {
+      console.log("AppPreview: Setting isLoading to false");
       setIsLoading(false);
     }
   };
