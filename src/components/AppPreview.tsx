@@ -295,7 +295,9 @@ const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis
                   <h5 className="text-sm font-medium mb-2">Key Elements</h5>
                   <div className="flex flex-wrap gap-2">
                     {appPreview.screens[activeScreen].keyElements.map((element, i) => (
-                      <Badge key={i} variant="secondary">{element}</Badge>
+                      <Badge key={i} variant="secondary">
+                        {typeof element === 'string' ? element : String(element)}
+                      </Badge>
                     ))}
                   </div>
                 </div>
