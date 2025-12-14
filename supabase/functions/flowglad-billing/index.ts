@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FLOWGLAD_API_URL = "https://app.flowglad.com/api";
+const FLOWGLAD_API_URL = "https://app.flowglad.com/api/v1";
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -80,13 +80,15 @@ serve(async (req) => {
       }
 
       // Create new customer
-      const newCustomer = await flowgladRequest("/customers", "POST", {
-        externalId: user.id,
-        email: user.email,
-        name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+      const newCustomerResponse = await flowgladRequest("/customers", "POST", {
+        customer: {
+          externalId: user.id,
+          email: user.email,
+          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+        },
       });
 
-      return newCustomer;
+      return newCustomerResponse.data?.customer || newCustomerResponse;
     };
 
     let result: any;
