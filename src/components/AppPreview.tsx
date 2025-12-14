@@ -59,7 +59,10 @@ const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
 
   useEffect(() => {
     console.log("AppPreview: Component mounted/updated, idea:", idea);
-    if (idea && !appPreview) {
+    if (idea) {
+      // Reset and regenerate when idea changes
+      setAppPreview(null);
+      setIsLoading(true);
       console.log("AppPreview: Starting generation for idea:", idea);
       generatePreview();
     }
@@ -366,7 +369,7 @@ const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
         </motion.div>
       </div>
 
-      {/* CTA */}
+      {/* Regenerate & CTA */}
       <motion.div variants={itemVariants}>
         <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
           <CardContent className="p-8 text-center">
@@ -375,13 +378,23 @@ const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Turn this concept into reality. Subscribe to FlowGladiator and start building your app today.
             </p>
-            <Button 
-              size="lg" 
-              onClick={() => navigate("/pricing")}
-              className="gap-2"
-            >
-              View Plans <ArrowRight className="w-4 h-4" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                variant="outline"
+                size="lg" 
+                onClick={generatePreview}
+                className="gap-2"
+              >
+                <Sparkles className="w-4 h-4" /> Regenerate Preview
+              </Button>
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/pricing")}
+                className="gap-2"
+              >
+                View Plans <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </motion.div>
