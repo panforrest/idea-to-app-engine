@@ -1,13 +1,30 @@
-import { useRef } from "react";
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import IdeaInputSection from "@/components/IdeaInputSection";
+import AnalysisResults from "@/components/AnalysisResults";
 import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+interface AnalysisData {
+  summary: string;
+  viabilityScore: number;
+  marketPotential: "low" | "medium" | "high";
+  strengths: string[];
+  challenges: string[];
+  recommendations: string[];
+  targetAudience: string;
+  competitiveAdvantage: string;
+  revenueModel: string;
+  nextSteps: string[];
+}
 
 const Index = () => {
-  const generatorRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
+  const [submittedIdea, setSubmittedIdea] = useState("");
 
   const scrollToGenerator = () => {
     const generatorSection = document.getElementById("generator");
@@ -16,13 +33,54 @@ const Index = () => {
     }
   };
 
-  const handleIdeaSubmit = (idea: string) => {
-    console.log("Idea submitted:", idea);
-    toast({
-      title: "Idea received!",
-      description: "AI analysis will be available in the next step. Let's set up the backend first!",
-    });
-    // This will be connected to AI analysis in next step
+  const handleIdeaSubmit = async (idea: string) => {
+    setIsLoading(true);
+    setAnalysis(null);
+    setSubmittedIdea(idea);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-idea', {
+        body: { idea }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to analyze idea');
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setAnalysis(data.analysis);
+      toast({
+        title: "Analysis Complete!",
+        description: "Your startup idea has been analyzed. Check out the results below.",
+      });
+
+      // Scroll to results
+      setTimeout(() => {
+        const resultsSection = document.getElementById("results");
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+
+    } catch (error) {
+      console.error('Error analyzing idea:', error);
+      toast({
+        title: "Analysis Failed",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleNewAnalysis = () => {
+    setAnalysis(null);
+    setSubmittedIdea("");
+    scrollToGenerator();
   };
 
   return (
@@ -32,9 +90,22 @@ const Index = () => {
       <main>
         <HeroSection onGetStarted={scrollToGenerator} />
         
-        <div ref={generatorRef}>
-          <IdeaInputSection onSubmit={handleIdeaSubmit} />
-        </div>
+        <IdeaInputSection onSubmit={handleIdeaSubmit} isLoading={isLoading} />
+        
+        {/* Analysis Results Section */}
+        {analysis && (
+          <section id="results" className="py-16 px-4">
+            <AnalysisResults analysis={analysis} idea={submittedIdea} />
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleNewAnalysis}
+                className="px-6 py-3 text-sm font-medium rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
+              >
+                Analyze Another Idea
+              </button>
+            </div>
+          </section>
+        )}
         
         <FeaturesSection />
       </main>
