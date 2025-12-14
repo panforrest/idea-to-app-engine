@@ -106,16 +106,16 @@ const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
   };
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0.01 }, // Changed from 0 to prevent invisible state
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
+      transition: { staggerChildren: 0.1, duration: 0.3 }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0.01, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   };
 
   if (isLoading) {
@@ -156,12 +156,15 @@ const AppPreview = ({ idea, analysis }: AppPreviewProps) => {
     );
   }
 
+  console.log("AppPreview: Rendering main content, appPreview:", appPreview?.appName);
+
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
       className="w-full max-w-5xl mx-auto space-y-6"
+      style={{ minHeight: '200px' }}
     >
       {/* App Header */}
       <motion.div variants={itemVariants}>
