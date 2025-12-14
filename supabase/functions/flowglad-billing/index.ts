@@ -167,6 +167,7 @@ serve(async (req) => {
         
         const checkoutSession = await flowgladRequest("/checkout-sessions", "POST", {
           checkoutSession: {
+            type: "product",
             customerId: customer.id,
             ...(priceSlug && { priceSlug }),
             ...(priceId && { priceId }),
