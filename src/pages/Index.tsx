@@ -119,7 +119,7 @@ const Index = () => {
                   <AnalysisResults analysis={analysis} idea={submittedIdea} />
                 </TabsContent>
                 <TabsContent value="preview">
-                  <AppPreview key={submittedIdea} idea={submittedIdea} analysis={analysis} />
+                  <AppPreview idea={submittedIdea} analysis={analysis} />
                 </TabsContent>
               </Tabs>
               <div className="flex justify-center mt-8">
