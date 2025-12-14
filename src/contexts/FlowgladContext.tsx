@@ -105,11 +105,23 @@ export function FlowgladProvider({ children }: { children: React.ReactNode }) {
         body: { action: "getBilling" },
       });
 
-      if (fnError) throw fnError;
+      if (fnError) {
+        // Don't throw on 401 - just means user isn't authenticated
+        if (fnError.message?.includes("401") || fnError.message?.includes("Unauthorized")) {
+          console.log("Billing: User not authenticated, skipping billing fetch");
+          setBilling(null);
+          return;
+        }
+        throw fnError;
+      }
       setBilling(data);
     } catch (e) {
       console.error("Error fetching billing:", e);
-      setError(e instanceof Error ? e : new Error("Failed to fetch billing"));
+      // Don't set error for auth-related issues
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      if (!errorMessage.includes("401") && !errorMessage.includes("Unauthorized")) {
+        setError(e instanceof Error ? e : new Error("Failed to fetch billing"));
+      }
     } finally {
       setIsLoading(false);
       setLoaded(true);
