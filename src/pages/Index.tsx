@@ -3,11 +3,13 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import IdeaInputSection from "@/components/IdeaInputSection";
 import AnalysisResults from "@/components/AnalysisResults";
+import AppPreview from "@/components/AppPreview";
 import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AnalysisData {
   summary: string;
@@ -107,14 +109,27 @@ const Index = () => {
         {/* Analysis Results Section */}
         {analysis && (
           <section id="results" className="py-16 px-4">
-            <AnalysisResults analysis={analysis} idea={submittedIdea} />
-            <div className="flex justify-center mt-8">
-              <button
-                onClick={handleNewAnalysis}
-                className="px-6 py-3 text-sm font-medium rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
-              >
-                Analyze Another Idea
-              </button>
+            <div className="max-w-5xl mx-auto">
+              <Tabs defaultValue="analysis" className="w-full">
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+                  <TabsTrigger value="analysis">📊 Analysis</TabsTrigger>
+                  <TabsTrigger value="preview">🎨 App Preview</TabsTrigger>
+                </TabsList>
+                <TabsContent value="analysis">
+                  <AnalysisResults analysis={analysis} idea={submittedIdea} />
+                </TabsContent>
+                <TabsContent value="preview">
+                  <AppPreview idea={submittedIdea} analysis={analysis} />
+                </TabsContent>
+              </Tabs>
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleNewAnalysis}
+                  className="px-6 py-3 text-sm font-medium rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
+                >
+                  Analyze Another Idea
+                </button>
+              </div>
             </div>
           </section>
         )}
