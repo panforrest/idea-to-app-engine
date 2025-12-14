@@ -54,14 +54,14 @@ const AppPreview = forwardRef<HTMLDivElement, AppPreviewProps>(({ idea, analysis
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeScreen, setActiveScreen] = useState(0);
-  const hasGenerated = useRef(false);
+  const lastGeneratedIdea = useRef<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Only generate once per idea
-    if (!hasGenerated.current && idea) {
-      hasGenerated.current = true;
+    // Generate preview when idea changes (new idea submitted)
+    if (idea && idea !== lastGeneratedIdea.current) {
+      lastGeneratedIdea.current = idea;
       generatePreview();
     }
   }, [idea]);
