@@ -186,9 +186,15 @@ serve(async (req) => {
       case "cancelSubscription": {
         const { subscriptionId, timing = "at_end_of_current_billing_period" } = params;
         
+        console.log("Canceling subscription:", subscriptionId, "with timing:", timing);
+        
         result = await flowgladRequest(`/subscriptions/${subscriptionId}/cancel`, "POST", {
-          timing,
+          cancellation: {
+            timing,
+          }
         });
+        
+        console.log("Cancel result:", JSON.stringify(result));
         break;
       }
 
